@@ -1,0 +1,6 @@
+{
+  "variants": {
+    "lit=true": { "model": "electric_rgb:block/lightbulb_on" },
+    "lit=false": { "model": "electric_rgb:block/lightbulb_off" }
+  }
+}

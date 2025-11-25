@@ -1,0 +1,99 @@
+plugins {
+    id 'eclipse'
+    id 'maven-publish'
+    id 'net.minecraftforge.gradle' version '[6.0.16,6.2)'
+}
+
+version = mod_version
+group = project.group
+archivesBaseName = modid
+
+base {
+    archivesName = modid
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+minecraft {
+    mappings channel: 'official', version: mc_version
+
+    runs {
+        client {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                electric_rgb {
+                    source sourceSets.main
+                }
+            }
+        }
+        server {
+            workingDirectory project.file('run')
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+            mods {
+                electric_rgb {
+                    source sourceSets.main
+                }
+            }
+        }
+        data {
+            workingDirectory project.file('run')
+            args '--mod', modid, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
+            mods {
+                electric_rgb {
+                    source sourceSets.main
+                }
+            }
+        }
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven { url = 'https://maven.minecraftforge.net' }
+    maven { url = 'https://maven.tterrag.com/' } // Create
+    maven { url = 'https://modmaven.dev' }
+    mavenCentral()
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${mc_version}-${forge_version}"
+    // The mod is FE-only; Create Crafts & Additions compatibility works via the FE capability.
+    // Uncomment these if you want to compile against the Create API as well:
+    // compileOnly fg.deobf("com.simibubi.create:create-${mc_version}:0.5.1.f")
+    // runtimeOnly fg.deobf("com.simibubi.create:create-${mc_version}:0.5.1.f")
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+tasks.withType(ProcessResources).configureEach {
+    var replaceProperties = [
+            mod_id      : modid,
+            mod_name    : 'Electric RGB',
+            mod_version : mod_version,
+            forge_version: forge_version,
+            mc_version  : mc_version
+    ]
+    inputs.properties replaceProperties
+    filesMatching('META-INF/mods.toml') {
+        expand replaceProperties
+    }
+}
+
+jar {
+    manifest {
+        attributes([
+                'Specification-Title'   : 'electric_rgb',
+                'Specification-Vendor'  : 'electricrgb',
+                'Specification-Version' : '1',
+                'Implementation-Title'  : project.name,
+                'Implementation-Version': mod_version,
+                'Implementation-Vendor' : 'electricrgb'
+        ])
+    }
+}
